@@ -10,4 +10,4 @@ Usage:
 
 Result:
 
-(Sample Result of Integration)[https://github.com/guilhermerochas/Neuroglia.Masstransit.WebSample/blob/main/Assets/Capturar.png]
+![Sample Result of Integration](https://github.com/guilhermerochas/Neuroglia.Masstransit.WebSample/blob/main/Assets/Capturar.png)
