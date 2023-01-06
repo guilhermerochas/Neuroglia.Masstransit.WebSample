@@ -1,7 +1,7 @@
 using MassTransit;
 
-using SaunterTest.Extensions;
-using SaunterTest.Handlers;
+using MasstransitTest.WebApiTest.Extensions;
+using MasstransitTest.WebApiTest.Handlers;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,22 +11,20 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddMassTransit(masstransitConfiguration =>
 {
-    masstransitConfiguration.AddConsumer<TestHandler>();
-    masstransitConfiguration.AddConsumer<TestHandler2>();
+    masstransitConfiguration.AddConsumer<FirstCommandHandler>().Endpoint(endpoint => endpoint.Name = $"{nameof(FirstCommandHandler)}.Endpoint");
+    masstransitConfiguration.AddConsumer<SecondCommandHandler>().Endpoint(endpoint => endpoint.Name = $"{nameof(SecondCommandHandler)}.Endpoint");
 
     masstransitConfiguration.UsingInMemory((context, configurator) =>
     {
         configurator.ReceiveEndpoint(new TemporaryEndpointDefinition(), receiveEndpointConfiguration =>
         {
-            receiveEndpointConfiguration.ConfigureConsumer<TestHandler>(context);
-            receiveEndpointConfiguration.ConfigureConsumer<TestHandler2>(context);
+            receiveEndpointConfiguration.ConfigureConsumer<FirstCommandHandler>(context);
+            receiveEndpointConfiguration.ConfigureConsumer<SecondCommandHandler>(context);
         });
-
-        configurator.ConfigureEndpoints(context);
     });
 });
 
-builder.Services.AddMasstransitWithSaunter();
+builder.Services.AddMasstransitAsyncApi();
 
 var app = builder.Build();
 
@@ -37,13 +35,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-app.UseRouting();
+app.UseAuthorization();
+app.UseNeuroliaMasstransit();
+app.MapControllers();
 
-app.MapMasstransitWithSaunter();
-
-app.UseEndpoints(endpoints =>
-{
-    endpoints.MapControllers();
-});
-
-await app.RunAsync();
+app.Run();
